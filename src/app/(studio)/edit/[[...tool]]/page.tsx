@@ -11,7 +11,7 @@ export { viewport } from "next-sanity/studio";
 
 export const metadata: Metadata = {
   ...studioMetadata,
-  title: "Shuili.dev 後台",
+  title: "shuili",
 };
 
 export function generateStaticParams() {

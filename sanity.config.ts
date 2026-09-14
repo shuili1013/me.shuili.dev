@@ -12,7 +12,7 @@ const singletons = ["siteSettings", "profile"];
 
 export default defineConfig({
   name: "default",
-  title: "Shuili.dev 後台",
+  title: "shuili",
   projectId,
   dataset,
   // Embedded in the site at /edit — see src/app/(studio)/edit.

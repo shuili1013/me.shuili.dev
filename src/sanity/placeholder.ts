@@ -14,7 +14,7 @@ export const placeholderSettings: SiteSettings = {
     "zh-TW": "Shuili 的個人網站與作品集 — 專案、文章與 3D。",
   },
   favicon: undefined,
-  wordmark: same("Shuili.dev"),
+  wordmark: same("shuili"),
   navItems: [
     { label: { en: "Home", "zh-TW": "首頁" }, linkType: "home", newTab: false },
     { label: { en: "Blogs", "zh-TW": "網誌" }, linkType: "blog", newTab: false },
@@ -37,7 +37,7 @@ export const placeholderSettings: SiteSettings = {
 };
 
 export const placeholderProfile: Profile = {
-  wordmark: same("Shuili.dev"),
+  wordmark: same("shuili"),
   tags: [
     { en: "Developer", "zh-TW": "開發者" },
     { en: "WebDev", "zh-TW": "網頁開發" },
