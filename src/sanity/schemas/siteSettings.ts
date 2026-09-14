@@ -73,7 +73,12 @@ const uiGroups: { name: string; title: string; fields: Record<string, string> }[
       langToggleAria: "語言切換按鈕的無障礙標籤",
       themeToggleAria: "深淺色按鈕的無障礙標籤",
       modelLoading: "3D 模型載入中文字",
+      modelError: "3D 模型載入失敗時的文字",
       modelHint: "3D 模型操作提示",
+      modelZoomHint: "滾輪經過 3D 模型時的縮放提示",
+      modelZoomIn: "3D「放大」按鈕的無障礙標籤",
+      modelZoomOut: "3D「縮小」按鈕的無障礙標籤",
+      modelReset: "3D「重設視角」按鈕的無障礙標籤",
     },
   },
 ];

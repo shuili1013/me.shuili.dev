@@ -23,6 +23,11 @@
     "langToggleAria": "切換語言",
     "themeToggleAria": "切換深淺色",
     "modelLoading": "3D 載入中…",
-    "modelHint": "拖曳旋轉 · 滾輪縮放"
+    "modelError": "3D 模型載入失敗",
+    "modelHint": "拖曳旋轉（觸控螢幕用雙指）",
+    "modelZoomHint": "按住 Ctrl / ⌘ 再滾動即可縮放",
+    "modelZoomIn": "放大",
+    "modelZoomOut": "縮小",
+    "modelReset": "重設視角"
   }
 }

@@ -42,7 +42,12 @@ export default async function PostPage({
   const dict = await getDictionary(locale);
   const modelLabels = {
     loading: dict.common.modelLoading,
+    error: dict.common.modelError,
     hint: dict.common.modelHint,
+    zoomHint: dict.common.modelZoomHint,
+    zoomIn: dict.common.modelZoomIn,
+    zoomOut: dict.common.modelZoomOut,
+    reset: dict.common.modelReset,
   };
 
   return (
@@ -79,11 +84,7 @@ export default async function PostPage({
       )}
       {post.models.map((model, i) => (
         <figure key={i}>
-          <ModelViewer
-            src={model.src}
-            loadingLabel={modelLabels.loading}
-            hint={modelLabels.hint}
-          />
+          <ModelViewer src={model.src} labels={modelLabels} />
           {model.caption && (
             <figcaption className="-mt-4 mb-6 text-center text-sm text-muted">
               {model.caption}

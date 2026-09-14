@@ -23,6 +23,11 @@
     "langToggleAria": "Switch language",
     "themeToggleAria": "Toggle theme",
     "modelLoading": "Loading 3D…",
-    "modelHint": "drag · scroll"
+    "modelError": "Couldn’t load this 3D model.",
+    "modelHint": "Drag to rotate · two fingers on touch screens",
+    "modelZoomHint": "Hold Ctrl / ⌘ and scroll to zoom",
+    "modelZoomIn": "Zoom in",
+    "modelZoomOut": "Zoom out",
+    "modelReset": "Reset view"
   }
 }

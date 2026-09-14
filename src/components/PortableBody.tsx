@@ -5,7 +5,7 @@ import {
 import type { PortableTextBlock } from "@portabletext/types";
 import Link from "next/link";
 import { urlFor } from "@/sanity/image";
-import { ModelViewer } from "./ModelViewer";
+import { ModelViewer, type ModelLabels } from "./ModelViewer";
 
 const components: PortableTextComponents = {
   types: {
@@ -87,7 +87,7 @@ export function PortableBody({
   modelLabels,
 }: {
   value: PortableTextBlock[];
-  modelLabels: { loading: string; hint: string };
+  modelLabels: ModelLabels;
 }) {
   return (
     <PortableText
@@ -97,11 +97,7 @@ export function PortableBody({
         types: {
           ...components.types,
           modelBlock: ({ value }: { value: { src?: string } }) => (
-            <ModelViewer
-              src={value?.src}
-              loadingLabel={modelLabels.loading}
-              hint={modelLabels.hint}
-            />
+            <ModelViewer src={value?.src} labels={modelLabels} />
           ),
         },
       }}
