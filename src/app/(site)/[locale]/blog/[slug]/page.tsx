@@ -77,13 +77,20 @@ export default async function PostPage({
           className="mt-6 w-full rounded-lg border border-border"
         />
       )}
-      {post.model && (
-        <ModelViewer
-          src={post.model}
-          loadingLabel={modelLabels.loading}
-          hint={modelLabels.hint}
-        />
-      )}
+      {post.models.map((model, i) => (
+        <figure key={i}>
+          <ModelViewer
+            src={model.src}
+            loadingLabel={modelLabels.loading}
+            hint={modelLabels.hint}
+          />
+          {model.caption && (
+            <figcaption className="-mt-4 mb-6 text-center text-sm text-muted">
+              {model.caption}
+            </figcaption>
+          )}
+        </figure>
+      ))}
 
       <div className="mt-6">
         <PortableBody value={post.body} modelLabels={modelLabels} />

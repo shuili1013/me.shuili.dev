@@ -110,9 +110,16 @@ export interface PostMeta {
   summary: string;
   tags: string[];
   cover?: string;
-  model?: string;
+}
+
+export interface PostModel {
+  src: string;
+  /** Empty when not set. */
+  caption: string;
 }
 
 export interface Post extends PostMeta {
+  /** 3D models shown under the cover, in order. */
+  models: PostModel[];
   body: PortableTextBlock[];
 }

@@ -46,11 +46,44 @@ export const post = defineType({
       options: { hotspot: true },
     }),
     defineField({
-      name: "model",
-      title: "3D 模型（GLB）",
-      description: "顯示在封面圖下方。內文中也可以插入 3D 模型區塊。",
-      type: "file",
-      options: { accept: ".glb,.gltf" },
+      name: "models",
+      title: "3D 模型（可多個）",
+      description:
+        "依序顯示在封面圖下方，可拖曳排序。想穿插在文字之間的話，也可以在內文插入「3D 模型」區塊。",
+      type: "array",
+      of: [
+        defineArrayMember({
+          type: "object",
+          name: "modelItem",
+          title: "3D 模型",
+          fields: [
+            defineField({
+              name: "file",
+              title: "GLB / glTF 檔案",
+              type: "file",
+              options: { accept: ".glb,.gltf" },
+              validation: (r) => r.required(),
+            }),
+            defineField({
+              name: "caption",
+              title: "說明（選填）",
+              description: "顯示在模型下方。",
+              type: "localeString",
+            }),
+          ],
+          preview: {
+            select: {
+              zh: "caption.zhTW",
+              en: "caption.en",
+              filename: "file.asset.originalFilename",
+            },
+            prepare: ({ zh, en, filename }) => ({
+              title: zh || en || filename || "3D 模型",
+              subtitle: zh || en ? filename : undefined,
+            }),
+          },
+        }),
+      ],
     }),
     defineField({ name: "body", title: "內文", type: "localePortableText" }),
   ],

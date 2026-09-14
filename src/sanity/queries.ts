@@ -319,7 +319,7 @@ export async function getAllSlugs(): Promise<string[]> {
 }
 
 interface RawPost extends RawPostMeta {
-  model?: string;
+  models?: { src?: string | null; caption?: L | null }[] | null;
   body?: {
     en?: PortableTextBlock[];
     "zh-TW"?: PortableTextBlock[];
@@ -340,7 +340,12 @@ export async function getPost(
   const raw = await client.fetch<RawPost | null>(
     `*[_type=="post" && slug.current==$slug][0]{
       ${POST_FIELDS},
-      "model": model.asset->url,
+      // Posts saved before multiple models had a single \`model\` file.
+      "models": select(
+        defined(models) => models[]{ "src": file.asset->url, caption${LOC} },
+        defined(model) => [{ "src": model.asset->url }],
+        []
+      ),
       ${BODY_PROJECTION}
     }`,
     { slug },
@@ -349,7 +354,9 @@ export async function getPost(
   const body = raw.body?.[locale];
   return {
     ...toMeta(raw, locale),
-    model: raw.model,
+    models: (raw.models ?? [])
+      .filter((m) => m?.src)
+      .map((m) => ({ src: m.src!, caption: t(m.caption, locale).trim() })),
     body: body?.length ? body : (raw.body?.en ?? []),
   };
 }
