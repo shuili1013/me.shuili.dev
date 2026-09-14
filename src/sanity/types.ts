@@ -118,8 +118,15 @@ export interface PostModel {
   caption: string;
 }
 
+/** Post page sections below the header, in their default order. */
+export const postSections = ["cover", "body", "models"] as const;
+
+export type PostSection = (typeof postSections)[number];
+
 export interface Post extends PostMeta {
-  /** 3D models shown under the cover, in order. */
+  /** 3D models, in order. */
   models: PostModel[];
   body: PortableTextBlock[];
+  /** Order of cover / body / models on the post page; always all three. */
+  sections: PostSection[];
 }

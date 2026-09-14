@@ -1,5 +1,11 @@
 import { defineArrayMember, defineField, defineType } from "sanity";
 import type { SanityDocument } from "sanity";
+import {
+  SectionOrderInput,
+  defaultSections,
+  sectionTitles,
+} from "../components/SectionOrderInput";
+import type { PostSection } from "../types";
 
 export const post = defineType({
   name: "post",
@@ -39,9 +45,44 @@ export const post = defineType({
       of: [defineArrayMember({ type: "localeString" })],
     }),
     defineField({
+      name: "sections",
+      title: "內容順序",
+      description: "拖曳調整封面圖、內文、3D 模型在文章頁出現的順序（標題固定在最上面）。",
+      type: "array",
+      of: [
+        defineArrayMember({
+          type: "object",
+          name: "postSection",
+          title: "區塊",
+          fields: [
+            defineField({
+              name: "kind",
+              title: "區塊",
+              type: "string",
+              readOnly: true,
+              options: {
+                list: Object.entries(sectionTitles).map(([value, title]) => ({
+                  value,
+                  title,
+                })),
+              },
+            }),
+          ],
+          preview: {
+            select: { kind: "kind" },
+            prepare: ({ kind }) => ({
+              title: sectionTitles[kind as PostSection] ?? "（未知區塊）",
+            }),
+          },
+        }),
+      ],
+      initialValue: defaultSections,
+      components: { input: SectionOrderInput },
+    }),
+    defineField({
       name: "cover",
       title: "封面圖",
-      description: "顯示在文章標題下方。",
+      description: "在文章頁的位置由「內容順序」決定。",
       type: "image",
       options: { hotspot: true },
     }),
@@ -49,7 +90,7 @@ export const post = defineType({
       name: "models",
       title: "3D 模型（可多個）",
       description:
-        "依序顯示在封面圖下方，可拖曳排序。想穿插在文字之間的話，也可以在內文插入「3D 模型」區塊。",
+        "可拖曳排序；整組在文章頁的位置由「內容順序」決定。想穿插在文字之間的話，也可以在內文插入「3D 模型」區塊。",
       type: "array",
       of: [
         defineArrayMember({

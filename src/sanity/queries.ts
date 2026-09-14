@@ -4,12 +4,14 @@ import type { Locale } from "@/i18n/config";
 import { client } from "./client";
 import { hasSanity } from "./env";
 import {
+  postSections,
   t,
   type BioItem,
   type L,
   type NavItem,
   type Post,
   type PostMeta,
+  type PostSection,
   type Profile,
   type ProjectItem,
   type RawL,
@@ -320,6 +322,7 @@ export async function getAllSlugs(): Promise<string[]> {
 
 interface RawPost extends RawPostMeta {
   models?: { src?: string | null; caption?: L | null }[] | null;
+  sections?: (string | null)[] | null;
   body?: {
     en?: PortableTextBlock[];
     "zh-TW"?: PortableTextBlock[];
@@ -331,6 +334,17 @@ const BODY_PROJECTION = `body{
   "en": en[]{ ..., _type=="modelBlock" => { ..., "src": file.asset->url } },
   "zh-TW": zhTW[]{ ..., _type=="modelBlock" => { ..., "src": file.asset->url } }
 }`;
+
+/**
+ * Section order from the Studio: unknown and duplicate entries are dropped and
+ * any missing section is appended in the default order (cover, body, models).
+ */
+function sectionOrder(raw: (string | null)[] | null | undefined): PostSection[] {
+  const picked = (raw ?? []).filter((kind): kind is PostSection =>
+    (postSections as readonly (string | null)[]).includes(kind),
+  );
+  return [...new Set([...picked, ...postSections])];
+}
 
 export async function getPost(
   slug: string,
@@ -346,6 +360,7 @@ export async function getPost(
         defined(model) => [{ "src": model.asset->url }],
         []
       ),
+      "sections": sections[].kind,
       ${BODY_PROJECTION}
     }`,
     { slug },
@@ -357,6 +372,7 @@ export async function getPost(
     models: (raw.models ?? [])
       .filter((m) => m?.src)
       .map((m) => ({ src: m.src!, caption: t(m.caption, locale).trim() })),
+    sections: sectionOrder(raw.sections),
     body: body?.length ? body : (raw.body?.en ?? []),
   };
 }

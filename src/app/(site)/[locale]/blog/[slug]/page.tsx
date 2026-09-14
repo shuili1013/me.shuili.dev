@@ -74,28 +74,42 @@ export default async function PostPage({
         </div>
       </header>
 
-      {post.cover && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={`${post.cover}?w=1200&fit=max&auto=format`}
-          alt=""
-          className="mt-6 w-full rounded-lg border border-border"
-        />
-      )}
-      {post.models.map((model, i) => (
-        <figure key={i}>
-          <ModelViewer src={model.src} labels={modelLabels} />
-          {model.caption && (
-            <figcaption className="-mt-4 mb-6 text-center text-sm text-muted">
-              {model.caption}
-            </figcaption>
-          )}
-        </figure>
-      ))}
-
-      <div className="mt-6">
-        <PortableBody value={post.body} modelLabels={modelLabels} />
-      </div>
+      {/* Cover, body and models in the order set in the Studio. */}
+      {post.sections.map((section) => {
+        switch (section) {
+          case "cover":
+            return post.cover ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                key={section}
+                src={`${post.cover}?w=1200&fit=max&auto=format`}
+                alt=""
+                className="mt-6 w-full rounded-lg border border-border"
+              />
+            ) : null;
+          case "body":
+            return (
+              <div key={section} className="mt-6">
+                <PortableBody value={post.body} modelLabels={modelLabels} />
+              </div>
+            );
+          case "models":
+            return post.models.length > 0 ? (
+              <div key={section}>
+                {post.models.map((model, i) => (
+                  <figure key={i}>
+                    <ModelViewer src={model.src} labels={modelLabels} />
+                    {model.caption && (
+                      <figcaption className="-mt-4 mb-6 text-center text-sm text-muted">
+                        {model.caption}
+                      </figcaption>
+                    )}
+                  </figure>
+                ))}
+              </div>
+            ) : null;
+        }
+      })}
 
       <hr className="my-10 border-border" />
       <Link
