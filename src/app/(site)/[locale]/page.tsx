@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { isLocale } from "@/i18n/config";
+import { isLocale, type Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
 import { getAllPosts, getProfile, getSiteSettings } from "@/sanity/queries";
 import { t } from "@/sanity/types";
@@ -8,6 +8,12 @@ import { Socials } from "@/components/Socials";
 import { Scramble } from "@/components/Scramble";
 
 const row = "grid grid-cols-[72px_1fr] gap-4 border-b border-border py-3";
+
+/** Site paths get the locale prefix; absolute URLs pass through. */
+function projectHref(url: string, locale: Locale) {
+  if (!url.startsWith("/")) return url;
+  return /^\/(en|zh-TW)(\/|$)/.test(url) ? url : `/${locale}${url}`;
+}
 
 // Every section renders only when its content is filled in the Studio.
 export default async function HomePage({
@@ -79,9 +85,17 @@ export default async function HomePage({
               <dt className="text-muted">{dict.home.bio}</dt>
               <dd>
                 <ul className="space-y-1">
-                  {profile.bio.map((item, i) => (
-                    <li key={i}>◦ {t(item, locale)}</li>
-                  ))}
+                  {profile.bio.map((item, i) => {
+                    const period = t(item.period, locale);
+                    return (
+                      <li key={i} className="flex items-baseline justify-between gap-4">
+                        <span>◦ {t(item.text, locale)}</span>
+                        {period && (
+                          <span className="shrink-0 text-sm text-muted">{period}</span>
+                        )}
+                      </li>
+                    );
+                  })}
                 </ul>
               </dd>
             </div>
@@ -122,7 +136,7 @@ export default async function HomePage({
         </>
       )}
 
-      {/* Work Experience */}
+      {/* Experience: projects */}
       {profile.experience.length > 0 && (
         <>
           <Scramble
@@ -130,16 +144,45 @@ export default async function HomePage({
             text={dict.home.sectionExperience}
             className="mt-16 mb-6 block text-2xl font-bold"
           />
-          <ul className="space-y-5">
-            {profile.experience.map((exp, i) => (
-              <li key={i} className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="font-bold">{t(exp.role, locale)}</p>
-                  <p className="text-muted">{t(exp.org, locale)}</p>
-                </div>
-                <span className="shrink-0 text-muted">{t(exp.period, locale)}</span>
-              </li>
-            ))}
+          <ul className="space-y-6">
+            {profile.experience.map((item, i) => {
+              const title = t(item.title, locale);
+              const description = t(item.description, locale);
+              const period = t(item.period, locale);
+              const href = item.url ? projectHref(item.url, locale) : undefined;
+              const external = Boolean(href && !href.startsWith("/"));
+              return (
+                <li key={i} className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="font-bold">
+                      {href ? (
+                        <a
+                          href={href}
+                          target={external ? "_blank" : undefined}
+                          rel="noreferrer"
+                          className="underline decoration-border underline-offset-4 transition-colors hover:decoration-foreground"
+                        >
+                          {title}
+                          {external && " ↗"}
+                        </a>
+                      ) : (
+                        title
+                      )}
+                    </p>
+                    {description && <p className="mt-1 text-muted">{description}</p>}
+                    {item.postSlug && (
+                      <Link
+                        href={`/${locale}/blog/${item.postSlug}`}
+                        className="mt-2 inline-block border border-border px-3 py-1 text-sm text-muted transition-colors hover:text-foreground"
+                      >
+                        {dict.home.readPost}
+                      </Link>
+                    )}
+                  </div>
+                  {period && <span className="shrink-0 text-muted">{period}</span>}
+                </li>
+              );
+            })}
           </ul>
         </>
       )}

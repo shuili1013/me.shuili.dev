@@ -5,12 +5,13 @@ import { client } from "./client";
 import { hasSanity } from "./env";
 import {
   t,
-  type Experience,
+  type BioItem,
   type L,
   type NavItem,
   type Post,
   type PostMeta,
   type Profile,
+  type ProjectItem,
   type RawL,
   type SiteSettings,
   type SocialIcon,
@@ -192,12 +193,36 @@ const PROFILE_QUERY = `*[_type=="profile"][0]{
   wordmark${LOC},
   intro${LOC},
   tags[]${LOC},
-  bio[]${LOC},
+  bio[]{
+    "text": select(
+      _type == "localeString" => {"en": en, "zh-TW": zhTW},
+      text{"en": en, "zh-TW": zhTW}
+    ),
+    period${LOC}
+  },
   skills[]${LOC},
-  experience[]{ role${LOC}, org${LOC}, period${LOC} }
+  experience[]{
+    // Items saved before 經歷 became projects used role/org.
+    "title": coalesce(title, role)${LOC},
+    "description": coalesce(description, org)${LOC},
+    period${LOC}, url,
+    "postSlug": post->slug.current
+  }
 }`;
 
-type RawProfile = { [K in keyof Profile]?: Profile[K] | null };
+type Raw<T> = { [K in keyof T]?: T[K] | null };
+
+interface RawProfile {
+  wordmark?: L | null;
+  tags?: L[] | null;
+  intro?: L | null;
+  email?: string | null;
+  // Items saved before bio had years are plain localeStrings (period null).
+  bio?: Raw<BioItem>[] | null;
+  resumeUrl?: string | null;
+  skills?: L[] | null;
+  experience?: Raw<ProjectItem>[] | null;
+}
 
 const EMPTY_PROFILE: Profile = {
   wordmark: EMPTY,
@@ -221,14 +246,22 @@ export const getProfile = cache(async (): Promise<Profile> => {
     tags: texts(raw.tags),
     intro: orL(raw.intro),
     email: raw.email?.trim() || "",
-    bio: texts(raw.bio),
+    bio: (raw.bio ?? [])
+      .map((b): BioItem => ({ text: orL(b?.text), period: orL(b?.period) }))
+      .filter((b) => hasText(b.text)),
     resumeUrl: raw.resumeUrl?.trim() || undefined,
     skills: texts(raw.skills),
     experience: (raw.experience ?? [])
       .map(
-        (e): Experience => ({ role: orL(e?.role), org: orL(e?.org), period: orL(e?.period) }),
+        (e): ProjectItem => ({
+          title: orL(e?.title),
+          description: orL(e?.description),
+          period: orL(e?.period),
+          url: e?.url?.trim() || undefined,
+          postSlug: e?.postSlug || undefined,
+        }),
       )
-      .filter((e) => hasText(e.role) || hasText(e.org)),
+      .filter((e) => hasText(e.title)),
   };
 });
 

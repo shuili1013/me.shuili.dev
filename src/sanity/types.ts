@@ -71,10 +71,21 @@ export interface SiteSettings {
   ui: UiStrings;
 }
 
-export interface Experience {
-  role: L;
-  org: L;
+/** Where I studied / worked, e.g. "大同大學 — 資訊工程學系" + "2020 - 2024". */
+export interface BioItem {
+  text: L;
   period: L;
+}
+
+/** A project I've done (the 經歷 section). */
+export interface ProjectItem {
+  title: L;
+  description: L;
+  period: L;
+  /** Project page: absolute URL, or a site path like `/blog/haus`. */
+  url?: string;
+  /** Slug of a related blog post. */
+  postSlug?: string;
 }
 
 export interface Profile {
@@ -82,10 +93,10 @@ export interface Profile {
   tags: L[];
   intro: L;
   email: string;
-  bio: L[];
+  bio: BioItem[];
   resumeUrl?: string;
   skills: L[];
-  experience: Experience[];
+  experience: ProjectItem[];
 }
 
 export interface PostMeta {
