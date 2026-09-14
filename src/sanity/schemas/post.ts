@@ -3,18 +3,19 @@ import type { SanityDocument } from "sanity";
 
 export const post = defineType({
   name: "post",
-  title: "Post",
+  title: "文章",
   type: "document",
   fields: [
     defineField({
       name: "title",
-      title: "Title",
+      title: "標題",
       type: "localeString",
       validation: (r) => r.required(),
     }),
     defineField({
       name: "slug",
-      title: "Slug",
+      title: "網址代稱（Slug）",
+      description: "中英文共用，例如 my-post → /en/blog/my-post、/zh-TW/blog/my-post",
       type: "slug",
       options: {
         source: (doc: SanityDocument) =>
@@ -23,37 +24,43 @@ export const post = defineType({
       },
       validation: (r) => r.required(),
     }),
-    defineField({ name: "date", title: "Date", type: "date" }),
-    defineField({ name: "summary", title: "Summary", type: "localeText" }),
+    defineField({ name: "date", title: "日期", type: "date" }),
+    defineField({ name: "summary", title: "摘要", type: "localeText" }),
     defineField({
       name: "tags",
-      title: "Tags",
+      title: "標籤",
       type: "array",
-      of: [defineArrayMember({ type: "string" })],
-      options: { layout: "tags" },
+      of: [defineArrayMember({ type: "localeString" })],
     }),
     defineField({
       name: "cover",
-      title: "Cover image",
+      title: "封面圖",
+      description: "顯示在文章標題下方。",
       type: "image",
       options: { hotspot: true },
     }),
     defineField({
       name: "model",
-      title: "3D model (GLB)",
+      title: "3D 模型（GLB）",
+      description: "顯示在封面圖下方。內文中也可以插入 3D 模型區塊。",
       type: "file",
       options: { accept: ".glb,.gltf" },
     }),
-    defineField({ name: "body", title: "Body", type: "localePortableText" }),
+    defineField({ name: "body", title: "內文", type: "localePortableText" }),
   ],
   orderings: [
     {
-      title: "Date, newest",
+      title: "日期（新到舊）",
       name: "dateDesc",
       by: [{ field: "date", direction: "desc" }],
     },
   ],
   preview: {
-    select: { title: "title.en", subtitle: "date" },
+    select: { zh: "title.zhTW", en: "title.en", subtitle: "date", media: "cover" },
+    prepare: ({ zh, en, subtitle, media }) => ({
+      title: zh || en,
+      subtitle,
+      media,
+    }),
   },
 });

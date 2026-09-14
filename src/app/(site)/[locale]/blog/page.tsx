@@ -13,7 +13,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   if (!isLocale(locale)) return {};
-  return { title: getDictionary(locale).work.title };
+  return { title: (await getDictionary(locale)).work.title };
 }
 
 export default async function WorkPage({
@@ -24,8 +24,10 @@ export default async function WorkPage({
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
 
-  const dict = getDictionary(locale);
-  const posts = await getAllPosts(locale);
+  const [dict, posts] = await Promise.all([
+    getDictionary(locale),
+    getAllPosts(locale),
+  ]);
 
   return (
     <section className="mx-auto w-full max-w-2xl px-6 py-10">

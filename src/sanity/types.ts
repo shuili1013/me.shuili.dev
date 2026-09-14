@@ -4,15 +4,71 @@ import type { Locale } from "@/i18n/config";
 // A bilingual string. Pick a language with `t(value, locale)`.
 export type L = Record<Locale, string>;
 
-export function t(value: L, locale: Locale): string {
-  return value?.[locale] ?? value?.en ?? "";
+// A bilingual string as stored in Sanity (`zhTW` field; either side may be unset).
+export interface RawL {
+  en?: string | null;
+  zhTW?: string | null;
 }
 
-export type SocialKind = "github" | "x" | "linkedin" | "instagram" | "email";
+export function t(value: L | null | undefined, locale: Locale): string {
+  return value?.[locale] || value?.en || "";
+}
+
+export const socialIcons = [
+  "github",
+  "x",
+  "linkedin",
+  "instagram",
+  "threads",
+  "facebook",
+  "youtube",
+  "discord",
+  "telegram",
+  "bluesky",
+  "email",
+  "link",
+] as const;
+
+export type SocialIcon = (typeof socialIcons)[number];
 
 export interface SocialLink {
-  kind: SocialKind;
-  href: string;
+  label: L;
+  icon: SocialIcon;
+  url: string;
+  /** Custom icon as a data URI, drawn as a mask so it follows the text color. */
+  maskUrl?: string;
+  /** Custom icon shown as-is (keeps its original colors). */
+  imageUrl?: string;
+}
+
+export type NavLinkType = "home" | "blog" | "path" | "external";
+
+export interface NavItem {
+  label: L;
+  linkType: NavLinkType;
+  /** Site path without the locale prefix, e.g. `/blog/haus` (linkType "path"). */
+  path?: string;
+  /** Absolute URL (linkType "external"). */
+  url?: string;
+  newTab: boolean;
+}
+
+/** Site settings → UI text as stored in Sanity: group → key → localized string. */
+export type UiStrings = Record<string, Record<string, RawL | null> | null>;
+
+export interface SiteSettings {
+  title: L;
+  titleTemplate: L;
+  description: L;
+  favicon?: { url: string; type: string; appleUrl?: string };
+  wordmark: L;
+  navItems: NavItem[];
+  showLangToggle: boolean;
+  showThemeToggle: boolean;
+  langToggleLabel: L;
+  copyright: L;
+  socials: SocialLink[];
+  ui: UiStrings;
 }
 
 export interface Experience {
@@ -22,16 +78,14 @@ export interface Experience {
 }
 
 export interface Profile {
-  wordmark: string;
-  name: L;
+  wordmark: L;
   tags: L[];
   intro: L;
   email: string;
   bio: L[];
   resumeUrl?: string;
-  skills: string[];
+  skills: L[];
   experience: Experience[];
-  socials: SocialLink[];
 }
 
 export interface PostMeta {

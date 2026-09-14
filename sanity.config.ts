@@ -1,37 +1,58 @@
+"use client";
+
 import { defineConfig } from "sanity";
 import { structureTool } from "sanity/structure";
 import { visionTool } from "@sanity/vision";
+import { zhHantLocale } from "@sanity/locale-zh-hant";
+import { CogIcon, DocumentTextIcon, UserIcon } from "@sanity/icons";
 import { schemaTypes } from "./src/sanity/schemas";
 import { projectId, dataset } from "./src/sanity/env";
 
-const singletons = ["profile"];
+const singletons = ["siteSettings", "profile"];
 
 export default defineConfig({
   name: "default",
-  title: "me.shuili.dev",
+  title: "Shuili.dev 後台",
   projectId,
   dataset,
+  // Embedded in the site at /edit — see src/app/(studio)/edit.
+  basePath: "/edit",
   plugins: [
     structureTool({
       structure: (S) =>
         S.list()
-          .title("Content")
+          .title("內容")
           .items([
             S.listItem()
-              .title("Profile")
-              .id("profile")
+              .title("網站設定")
+              .id("siteSettings")
+              .icon(CogIcon)
               .child(
-                S.document().schemaType("profile").documentId("profile"),
+                S.document()
+                  .schemaType("siteSettings")
+                  .documentId("siteSettings")
+                  .title("網站設定"),
+              ),
+            S.listItem()
+              .title("個人資料")
+              .id("profile")
+              .icon(UserIcon)
+              .child(
+                S.document()
+                  .schemaType("profile")
+                  .documentId("profile")
+                  .title("個人資料"),
               ),
             S.divider(),
-            S.documentTypeListItem("post").title("Posts"),
+            S.documentTypeListItem("post").title("文章").icon(DocumentTextIcon),
           ]),
     }),
     visionTool(),
+    zhHantLocale(),
   ],
   schema: {
     types: schemaTypes,
-    // keep the singleton out of the global "create new" menu
+    // keep singletons out of the global "create new" menu
     templates: (templates) =>
       templates.filter(({ schemaType }) => !singletons.includes(schemaType)),
   },

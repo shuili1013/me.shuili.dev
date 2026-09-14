@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getAllSlugs, getPost } from "@/sanity/queries";
 import { isLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
+import { ModelViewer } from "@/components/ModelViewer";
 import { PortableBody } from "@/components/PortableBody";
 import { Scramble } from "@/components/Scramble";
 
@@ -38,7 +39,11 @@ export default async function PostPage({
   const post = await getPost(slug, locale);
   if (!post) notFound();
 
-  const dict = getDictionary(locale);
+  const dict = await getDictionary(locale);
+  const modelLabels = {
+    loading: dict.common.modelLoading,
+    hint: dict.common.modelHint,
+  };
 
   return (
     <article className="mx-auto w-full max-w-2xl px-6 py-10">
@@ -63,8 +68,24 @@ export default async function PostPage({
         </div>
       </header>
 
+      {post.cover && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={`${post.cover}?w=1200&fit=max&auto=format`}
+          alt=""
+          className="mt-6 w-full rounded-lg border border-border"
+        />
+      )}
+      {post.model && (
+        <ModelViewer
+          src={post.model}
+          loadingLabel={modelLabels.loading}
+          hint={modelLabels.hint}
+        />
+      )}
+
       <div className="mt-6">
-        <PortableBody value={post.body} />
+        <PortableBody value={post.body} modelLabels={modelLabels} />
       </div>
 
       <hr className="my-10 border-border" />

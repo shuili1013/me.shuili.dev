@@ -1,40 +1,27 @@
 {
-  "nav": {
-    "home": "Home",
-    "work": "Blogs",
-    "about": "About",
-    "resume": "Resume"
-  },
   "home": {
     "email": "Email",
     "bio": "Bio",
-    "blog": "Blog",
     "resume": "Resume",
-    "sectionExperience": "Experience",
     "sectionSkills": "Skills",
+    "sectionExperience": "Experience",
     "sectionFeatured": "Selected Work",
-    "sectionConnect": "Connect",
-    "viewAllWork": "View all →",
-    "present": "Present"
+    "viewAllWork": "View all →"
   },
   "work": {
     "title": "Blog",
     "subtitle": "Things I've built — projects, experiments and writing.",
     "empty": "No posts yet.",
-    "all": "All",
-    "readMore": "Read more →"
-  },
-  "about": {
-    "title": "About",
-    "resume": "Download résumé"
+    "all": "All"
   },
   "post": {
     "backToWork": "← Back",
-    "backHome": "← Home",
-    "aboutMe": "Read about me →",
-    "tags": "Tags"
+    "backHome": "← Home"
   },
-  "footer": {
-    "rights": "All rights reserved."
+  "common": {
+    "langToggleAria": "Switch language",
+    "themeToggleAria": "Toggle theme",
+    "modelLoading": "Loading 3D…",
+    "modelHint": "drag · scroll"
   }
 }

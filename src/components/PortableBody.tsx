@@ -9,9 +9,6 @@ import { ModelViewer } from "./ModelViewer";
 
 const components: PortableTextComponents = {
   types: {
-    modelBlock: ({ value }: { value: { src?: string } }) => (
-      <ModelViewer src={value?.src} />
-    ),
     image: ({ value }: { value: { alt?: string } }) => (
       // eslint-disable-next-line @next/next/no-img-element
       <img
@@ -85,6 +82,29 @@ const components: PortableTextComponents = {
   },
 };
 
-export function PortableBody({ value }: { value: PortableTextBlock[] }) {
-  return <PortableText value={value} components={components} />;
+export function PortableBody({
+  value,
+  modelLabels,
+}: {
+  value: PortableTextBlock[];
+  modelLabels: { loading: string; hint: string };
+}) {
+  return (
+    <PortableText
+      value={value}
+      components={{
+        ...components,
+        types: {
+          ...components.types,
+          modelBlock: ({ value }: { value: { src?: string } }) => (
+            <ModelViewer
+              src={value?.src}
+              loadingLabel={modelLabels.loading}
+              hint={modelLabels.hint}
+            />
+          ),
+        },
+      }}
+    />
+  );
 }

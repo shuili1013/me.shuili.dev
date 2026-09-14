@@ -12,7 +12,7 @@ function applyTheme(next: boolean) {
   }
 }
 
-export function ThemeToggle() {
+export function ThemeToggle({ ariaLabel }: { ariaLabel: string }) {
   const [dark, setDark] = useState(true);
   const [mounted, setMounted] = useState(false);
 
@@ -72,7 +72,7 @@ export function ThemeToggle() {
   return (
     <button
       type="button"
-      aria-label="Toggle theme"
+      aria-label={ariaLabel}
       onClick={onClick}
       className="grid h-9 w-9 place-items-center rounded-full border border-border text-muted transition-colors hover:text-foreground"
     >

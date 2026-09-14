@@ -2,81 +2,73 @@ import { defineArrayMember, defineField, defineType } from "sanity";
 
 export const profile = defineType({
   name: "profile",
-  title: "Profile",
+  title: "個人資料",
   type: "document",
   fields: [
-    defineField({ name: "wordmark", title: "Wordmark", type: "string" }),
-    defineField({ name: "name", title: "Name", type: "localeString" }),
+    defineField({ name: "wordmark", title: "首頁大標題", type: "localeString" }),
     defineField({
       name: "tags",
-      title: "Tags",
+      title: "身分標籤",
+      description: "顯示在首頁大標題下方。",
       type: "array",
       of: [defineArrayMember({ type: "localeString" })],
     }),
-    defineField({ name: "intro", title: "Intro", type: "localeText" }),
-    defineField({ name: "email", title: "Email", type: "string" }),
+    defineField({ name: "intro", title: "自我介紹", type: "localeText" }),
+    defineField({
+      name: "email",
+      title: "Email",
+      type: "string",
+      validation: (r) => r.email(),
+    }),
     defineField({
       name: "bio",
-      title: "Bio (bullet list)",
+      title: "Bio（條列）",
       type: "array",
       of: [defineArrayMember({ type: "localeString" })],
     }),
-    defineField({ name: "resumeUrl", title: "Résumé URL", type: "url" }),
+    defineField({
+      name: "resumeUrl",
+      title: "履歷連結",
+      description: "有填才會顯示在首頁。",
+      type: "url",
+    }),
     defineField({
       name: "skills",
-      title: "Skills",
+      title: "技能",
       type: "array",
-      of: [defineArrayMember({ type: "string" })],
-      options: { layout: "tags" },
+      of: [defineArrayMember({ type: "localeString" })],
     }),
     defineField({
       name: "experience",
-      title: "Experience",
+      title: "經歷",
       type: "array",
       of: [
         defineArrayMember({
           type: "object",
           name: "experienceItem",
+          title: "經歷",
           fields: [
-            defineField({ name: "role", title: "Role", type: "localeString" }),
-            defineField({ name: "org", title: "Org", type: "localeString" }),
-            defineField({
-              name: "period",
-              title: "Period",
-              type: "localeString",
-            }),
+            defineField({ name: "role", title: "職稱", type: "localeString" }),
+            defineField({ name: "org", title: "公司／組織", type: "localeString" }),
+            defineField({ name: "period", title: "期間", type: "localeString" }),
           ],
           preview: {
-            select: { title: "role.en", subtitle: "org.en" },
-          },
-        }),
-      ],
-    }),
-    defineField({
-      name: "socials",
-      title: "Socials",
-      type: "array",
-      of: [
-        defineArrayMember({
-          type: "object",
-          name: "social",
-          fields: [
-            defineField({
-              name: "kind",
-              title: "Kind",
-              type: "string",
-              options: {
-                list: ["github", "x", "linkedin", "instagram", "email"],
-              },
+            select: {
+              role: "role.zhTW",
+              roleEn: "role.en",
+              org: "org.zhTW",
+              orgEn: "org.en",
+            },
+            prepare: ({ role, roleEn, org, orgEn }) => ({
+              title: role || roleEn,
+              subtitle: org || orgEn,
             }),
-            defineField({ name: "href", title: "URL", type: "string" }),
-          ],
-          preview: { select: { title: "kind", subtitle: "href" } },
+          },
         }),
       ],
     }),
   ],
   preview: {
-    prepare: () => ({ title: "Profile" }),
+    prepare: () => ({ title: "個人資料" }),
   },
 });

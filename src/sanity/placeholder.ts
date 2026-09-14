@@ -1,11 +1,43 @@
 import type { PortableTextBlock } from "@portabletext/types";
-import type { L, Profile } from "./types";
+import type { L, Profile, SiteSettings } from "./types";
 
-// Shown until the Sanity project is configured + seeded. Once env is set and
-// content is published, getProfile() returns the live CMS data instead.
+// Shown until the Sanity project is configured + seeded, and used as the
+// per-field fallback for Site settings left blank in the Studio.
+
+const same = (text: string): L => ({ en: text, "zh-TW": text });
+
+export const placeholderSettings: SiteSettings = {
+  title: same("Shuili"),
+  titleTemplate: same("%s · Shuili"),
+  description: {
+    en: "Personal site & portfolio of Shuili — projects, writing, and 3D.",
+    "zh-TW": "Shuili 的個人網站與作品集 — 專案、文章與 3D。",
+  },
+  favicon: undefined,
+  wordmark: same("Shuili.dev"),
+  navItems: [
+    { label: { en: "Home", "zh-TW": "首頁" }, linkType: "home", newTab: false },
+    { label: { en: "Blogs", "zh-TW": "網誌" }, linkType: "blog", newTab: false },
+  ],
+  showLangToggle: true,
+  showThemeToggle: true,
+  langToggleLabel: { en: "中文", "zh-TW": "EN" },
+  copyright: {
+    en: "© {year} Shuili. All rights reserved.",
+    "zh-TW": "© {year} Shuili. 版權所有。",
+  },
+  socials: [
+    { label: same("GitHub"), icon: "github", url: "https://github.com/" },
+    { label: same("X"), icon: "x", url: "https://x.com/" },
+    { label: same("LinkedIn"), icon: "linkedin", url: "https://linkedin.com/" },
+    { label: same("Instagram"), icon: "instagram", url: "https://instagram.com/" },
+    { label: same("Email"), icon: "email", url: "mailto:member@haus.tw" },
+  ],
+  ui: {},
+};
+
 export const placeholderProfile: Profile = {
-  wordmark: "Shuili.dev",
-  name: { en: "Shuili", "zh-TW": "Shuili" },
+  wordmark: same("Shuili.dev"),
   tags: [
     { en: "Developer", "zh-TW": "開發者" },
     { en: "WebDev", "zh-TW": "網頁開發" },
@@ -33,25 +65,18 @@ export const placeholderProfile: Profile = {
     "Tailwind CSS",
     "Python",
     "Docker",
-  ],
+  ].map(same),
   experience: [
     {
       role: { en: "Software Developer", "zh-TW": "軟體開發者" },
-      org: { en: "Haus", "zh-TW": "Haus" },
+      org: same("Haus"),
       period: { en: "2024 - Present", "zh-TW": "2024 - 至今" },
     },
     {
       role: { en: "Freelance / Side Projects", "zh-TW": "接案 / 個人專案" },
       org: { en: "Self", "zh-TW": "自由工作" },
-      period: { en: "2021 - 2024", "zh-TW": "2021 - 2024" },
+      period: same("2021 - 2024"),
     },
-  ],
-  socials: [
-    { kind: "github", href: "https://github.com/" },
-    { kind: "x", href: "https://x.com/" },
-    { kind: "linkedin", href: "https://linkedin.com/" },
-    { kind: "instagram", href: "https://instagram.com/" },
-    { kind: "email", href: "mailto:member@haus.tw" },
   ],
 };
 
@@ -61,7 +86,7 @@ export interface RawPlaceholderPost {
   title: L;
   summary: L;
   date: string;
-  tags: string[];
+  tags: L[];
   body: Record<"en" | "zh-TW", PortableTextBlock[]>;
 }
 
@@ -83,7 +108,7 @@ export const placeholderPosts: RawPlaceholderPost[] = [
       "zh-TW": "一個中英雙語的個人網站，內建可互動的 3D 檢視器。",
     },
     date: "2026-06-20",
-    tags: ["Next.js", "React", "3D"],
+    tags: ["Next.js", "React", "3D"].map(same),
     body: {
       en: [
         para(
@@ -99,13 +124,13 @@ export const placeholderPosts: RawPlaceholderPost[] = [
   },
   {
     slug: "haus",
-    title: { en: "Haus", "zh-TW": "Haus" },
+    title: same("Haus"),
     summary: {
       en: "A product I help build — web platform, services and operations.",
       "zh-TW": "我參與打造的產品 — 網頁平台、服務與營運。",
     },
     date: "2026-03-01",
-    tags: ["Next.js", "Node.js", "Product"],
+    tags: [same("Next.js"), same("Node.js"), { en: "Product", "zh-TW": "產品" }],
     body: {
       en: [para("Haus is a web product I work on day to day.")],
       "zh-TW": [para("Haus 是我日常參與的網頁產品。")],

@@ -2,9 +2,17 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { locales, localeNames, type Locale } from "@/i18n/config";
+import { locales, type Locale } from "@/i18n/config";
 
-export function LangToggle({ locale }: { locale: Locale }) {
+export function LangToggle({
+  locale,
+  label,
+  ariaLabel,
+}: {
+  locale: Locale;
+  label: string;
+  ariaLabel: string;
+}) {
   const pathname = usePathname() || `/${locale}`;
   const other = locales.find((l) => l !== locale) ?? locale;
 
@@ -16,10 +24,10 @@ export function LangToggle({ locale }: { locale: Locale }) {
   return (
     <Link
       href={href}
-      aria-label="Switch language"
+      aria-label={ariaLabel}
       className="text-sm text-muted transition-colors hover:text-foreground"
     >
-      {localeNames[other]}
+      {label}
     </Link>
   );
 }

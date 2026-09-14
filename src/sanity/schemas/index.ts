@@ -1,6 +1,7 @@
 import type { SchemaTypeDefinition } from "sanity";
 import { localeString, localeText } from "./localeString";
 import { localePortableText, modelBlock } from "./modelBlock";
+import { siteSettings } from "./siteSettings";
 import { profile } from "./profile";
 import { post } from "./post";
 
@@ -9,6 +10,7 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   localeText,
   localePortableText,
   modelBlock,
+  siteSettings,
   profile,
   post,
 ];
