@@ -172,19 +172,29 @@ const PROFILE_QUERY = `*[_type=="profile"][0]{
 
 type RawProfile = { [K in keyof Profile]?: Profile[K] | null };
 
-export const getProfile = cache(async (): Promise<Profile> => {
-  if (!hasSanity) return placeholderProfile;
-  const raw = await client.fetch<RawProfile | null>(PROFILE_QUERY);
-  if (!raw) return placeholderProfile;
+/** Projected `L` (possibly with null sides) → `L`, per-language fallback. */
+function orL(raw: Partial<Record<keyof L, string | null>> | null | undefined, fallback: L): L {
   return {
-    wordmark: raw.wordmark ?? placeholderProfile.wordmark,
-    tags: raw.tags ?? [],
-    intro: raw.intro ?? EMPTY,
-    email: raw.email ?? "",
-    bio: raw.bio ?? [],
-    resumeUrl: raw.resumeUrl ?? undefined,
-    skills: raw.skills ?? [],
-    experience: raw.experience ?? [],
+    en: raw?.en?.trim() || fallback.en,
+    "zh-TW": raw?.["zh-TW"]?.trim() || fallback["zh-TW"],
+  };
+}
+
+/** Profile with every blank field filled from the built-in defaults. */
+export const getProfile = cache(async (): Promise<Profile> => {
+  const d = placeholderProfile;
+  if (!hasSanity) return d;
+  const raw = await client.fetch<RawProfile | null>(PROFILE_QUERY);
+  if (!raw) return d;
+  return {
+    wordmark: orL(raw.wordmark, d.wordmark),
+    tags: raw.tags?.length ? raw.tags : d.tags,
+    intro: orL(raw.intro, d.intro),
+    email: raw.email?.trim() || d.email,
+    bio: raw.bio?.length ? raw.bio : d.bio,
+    resumeUrl: raw.resumeUrl ?? d.resumeUrl,
+    skills: raw.skills?.length ? raw.skills : d.skills,
+    experience: raw.experience?.length ? raw.experience : d.experience,
   };
 });
 

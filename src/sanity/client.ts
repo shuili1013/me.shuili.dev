@@ -7,5 +7,7 @@ export const client = createClient({
   projectId: projectId || "placeholder",
   dataset,
   apiVersion,
-  useCdn: true,
+  // Builds are triggered right after a publish; bypass the CDN so they never
+  // read stale content.
+  useCdn: false,
 });
