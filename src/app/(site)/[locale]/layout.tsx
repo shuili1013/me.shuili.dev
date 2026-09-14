@@ -23,12 +23,17 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const template = t(settings.titleTemplate, locale);
   const { favicon } = settings;
 
+  // Blank title/template/description stay blank (no built-in fallback).
   return {
     title: {
       default: title,
-      template: template.includes("%s") ? template : `%s · ${title}`,
+      template: template.includes("%s")
+        ? template
+        : title
+          ? `%s · ${title}`
+          : "%s",
     },
-    description: t(settings.description, locale),
+    description: t(settings.description, locale) || undefined,
     icons: favicon && {
       icon: { url: favicon.url, type: favicon.type },
       apple: favicon.appleUrl,

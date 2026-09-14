@@ -5,7 +5,7 @@ import { fontVariables, themeScript } from "./shell";
 
 // The app has two root layouts ((site) and (studio)), so the 404 page is global.
 export const metadata: Metadata = {
-  title: "404 · Shuili",
+  title: "404 · shuili",
   robots: { index: false },
 };
 

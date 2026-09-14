@@ -9,6 +9,7 @@ import { Scramble } from "@/components/Scramble";
 
 const row = "grid grid-cols-[72px_1fr] gap-4 border-b border-border py-3";
 
+// Every section renders only when its content is filled in the Studio.
 export default async function HomePage({
   params,
 }: {
@@ -24,74 +25,84 @@ export default async function HomePage({
     getAllPosts(locale),
   ]);
   const posts = allPosts.slice(0, 4);
+  const wordmark = t(profile.wordmark, locale);
+  const intro = t(profile.intro, locale);
+  const hasRows = Boolean(
+    profile.email || profile.bio.length > 0 || profile.resumeUrl,
+  );
 
   return (
     <div className="mx-auto max-w-2xl px-6 pt-10 pb-8">
-      {/* Wordmark + tags */}
-      <Scramble
-        as="h1"
-        text={t(profile.wordmark, locale)}
-        className="block text-4xl font-bold sm:text-5xl"
-      />
-      <div className="mt-3 flex flex-wrap gap-2">
-        {profile.tags.map((tag, i) => (
-          <span key={i} className="border border-border px-3 py-1 text-muted">
-            {t(tag, locale)}
-          </span>
-        ))}
-      </div>
+      {wordmark && (
+        <Scramble
+          as="h1"
+          text={wordmark}
+          className="block text-4xl font-bold sm:text-5xl"
+        />
+      )}
+      {profile.tags.length > 0 && (
+        <div className="mt-3 flex flex-wrap gap-2">
+          {profile.tags.map((tag, i) => (
+            <span key={i} className="border border-border px-3 py-1 text-muted">
+              {t(tag, locale)}
+            </span>
+          ))}
+        </div>
+      )}
 
-      <div className="mt-4">
-        <Socials socials={settings.socials} locale={locale} />
-      </div>
+      {settings.socials.length > 0 && (
+        <div className="mt-4">
+          <Socials socials={settings.socials} locale={locale} />
+        </div>
+      )}
 
-      <p className="mt-6 leading-7 text-foreground/90">
-        {t(profile.intro, locale)}
-      </p>
+      {intro && <p className="mt-6 leading-7 text-foreground/90">{intro}</p>}
 
       {/* Key-value rows */}
-      <dl className="mt-8 border-t border-border">
-        {profile.email && (
-          <div className={row}>
-            <dt className="text-muted">{dict.home.email}</dt>
-            <dd>
-              <a
-                href={`mailto:${profile.email}`}
-                className="underline-offset-4 hover:underline"
-              >
-                {profile.email}
-              </a>
-            </dd>
-          </div>
-        )}
-        {profile.bio.length > 0 && (
-          <div className={row}>
-            <dt className="text-muted">{dict.home.bio}</dt>
-            <dd>
-              <ul className="space-y-1">
-                {profile.bio.map((item, i) => (
-                  <li key={i}>◦ {t(item, locale)}</li>
-                ))}
-              </ul>
-            </dd>
-          </div>
-        )}
-        {profile.resumeUrl && (
-          <div className={row}>
-            <dt className="text-muted">{dict.home.resume}</dt>
-            <dd className="break-all">
-              <a
-                href={profile.resumeUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="underline-offset-4 hover:underline"
-              >
-                {profile.resumeUrl.replace(/^https?:\/\//, "")}
-              </a>
-            </dd>
-          </div>
-        )}
-      </dl>
+      {hasRows && (
+        <dl className="mt-8 border-t border-border">
+          {profile.email && (
+            <div className={row}>
+              <dt className="text-muted">{dict.home.email}</dt>
+              <dd>
+                <a
+                  href={`mailto:${profile.email}`}
+                  className="underline-offset-4 hover:underline"
+                >
+                  {profile.email}
+                </a>
+              </dd>
+            </div>
+          )}
+          {profile.bio.length > 0 && (
+            <div className={row}>
+              <dt className="text-muted">{dict.home.bio}</dt>
+              <dd>
+                <ul className="space-y-1">
+                  {profile.bio.map((item, i) => (
+                    <li key={i}>◦ {t(item, locale)}</li>
+                  ))}
+                </ul>
+              </dd>
+            </div>
+          )}
+          {profile.resumeUrl && (
+            <div className={row}>
+              <dt className="text-muted">{dict.home.resume}</dt>
+              <dd className="break-all">
+                <a
+                  href={profile.resumeUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="underline-offset-4 hover:underline"
+                >
+                  {profile.resumeUrl.replace(/^https?:\/\//, "")}
+                </a>
+              </dd>
+            </div>
+          )}
+        </dl>
+      )}
 
       {/* Skills */}
       {profile.skills.length > 0 && (
@@ -134,37 +145,41 @@ export default async function HomePage({
       )}
 
       {/* Selected Work */}
-      <div className="mt-16 mb-6 flex items-baseline justify-between">
-        <Scramble
-          as="h2"
-          text={dict.home.sectionFeatured}
-          className="text-2xl font-bold"
-        />
-        <Link
-          href={`/${locale}/blog`}
-          className="text-sm text-muted underline-offset-4 hover:text-foreground hover:underline"
-        >
-          {dict.home.viewAllWork}
-        </Link>
-      </div>
-      <ul className="divide-y divide-border border-y border-border">
-        {posts.map((post) => (
-          <li key={post.slug}>
+      {posts.length > 0 && (
+        <>
+          <div className="mt-16 mb-6 flex items-baseline justify-between">
+            <Scramble
+              as="h2"
+              text={dict.home.sectionFeatured}
+              className="text-2xl font-bold"
+            />
             <Link
-              href={`/${locale}/blog/${post.slug}`}
-              className="group flex items-start justify-between gap-4 py-4 transition-colors hover:bg-card"
+              href={`/${locale}/blog`}
+              className="text-sm text-muted underline-offset-4 hover:text-foreground hover:underline"
             >
-              <div>
-                <p className="font-bold group-hover:underline">{post.title}</p>
-                {post.summary && (
-                  <p className="mt-1 text-muted">{post.summary}</p>
-                )}
-              </div>
-              <span className="shrink-0 text-muted">{post.date}</span>
+              {dict.home.viewAllWork}
             </Link>
-          </li>
-        ))}
-      </ul>
+          </div>
+          <ul className="divide-y divide-border border-y border-border">
+            {posts.map((post) => (
+              <li key={post.slug}>
+                <Link
+                  href={`/${locale}/blog/${post.slug}`}
+                  className="group flex items-start justify-between gap-4 py-4 transition-colors hover:bg-card"
+                >
+                  <div>
+                    <p className="font-bold group-hover:underline">{post.title}</p>
+                    {post.summary && (
+                      <p className="mt-1 text-muted">{post.summary}</p>
+                    )}
+                  </div>
+                  <span className="shrink-0 text-muted">{post.date}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
     </div>
   );
 }

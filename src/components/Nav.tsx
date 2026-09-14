@@ -45,9 +45,13 @@ export function Nav({
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur">
       <div className="mx-auto flex h-14 max-w-2xl items-center justify-between px-6">
-        <Link href={base} className="font-bold">
-          {wordmark}
-        </Link>
+        {wordmark ? (
+          <Link href={base} className="font-bold">
+            {wordmark}
+          </Link>
+        ) : (
+          <span />
+        )}
 
         <div className="flex items-center gap-4 text-sm">
           {items.map((item, i) => {

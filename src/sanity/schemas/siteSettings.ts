@@ -99,7 +99,7 @@ export const siteSettings = defineType({
     defineField({
       name: "titleTemplate",
       title: "子頁面標題格式",
-      description: "%s 會換成頁面名稱，例如「%s · Shuili」→「網誌 · Shuili」。",
+      description: "%s 會換成頁面名稱，例如「%s · shuili」→「網誌 · shuili」。留白時會用「%s · 網站標題」。",
       type: "localeString",
       group: "basic",
     }),
@@ -287,10 +287,18 @@ export const siteSettings = defineType({
             defineField({
               name: "url",
               title: "連結",
-              description: "例如 https://github.com/you 或 mailto:you@example.com",
-              type: "url",
+              description: "網址（例如 https://github.com/you）或 Email（直接填 you@example.com 即可）",
+              type: "string",
               validation: (r) =>
-                r.required().uri({ scheme: ["http", "https", "mailto", "tel"] }),
+                r.required().custom((value) => {
+                  const v = value?.trim() ?? "";
+                  if (!v) return true;
+                  return (
+                    /^(https?:\/\/|mailto:|tel:)\S+$/.test(v) ||
+                    /^[^\s@/:]+@[^\s@/]+\.[^\s@/]+$/.test(v) ||
+                    "請填 https:// 開頭的網址，或 Email 地址"
+                  );
+                }),
             }),
           ],
           preview: {

@@ -4,12 +4,8 @@ import type { Locale } from "@/i18n/config";
 import { client } from "./client";
 import { hasSanity } from "./env";
 import {
-  placeholderPosts,
-  placeholderProfile,
-  placeholderSettings,
-} from "./placeholder";
-import {
   t,
+  type Experience,
   type L,
   type NavItem,
   type Post,
@@ -22,18 +18,28 @@ import {
   type UiStrings,
 } from "./types";
 
+// Content comes only from Sanity: anything left blank in the Studio is not
+// rendered. Only interface strings (src/i18n/dictionaries) have defaults.
+
 // Project a localized object {en, zhTW} into the frontend `L` shape {en, "zh-TW"}.
 const LOC = `{en, "zh-TW": zhTW}`;
 
 const EMPTY: L = { en: "", "zh-TW": "" };
 
 /** Sanity `{en, zhTW}` → `L`, falling back per language to `fallback`. */
-function loc(raw: RawL | null | undefined, fallback: L): L {
+function loc(raw: RawL | null | undefined, fallback: L = EMPTY): L {
   return {
     en: raw?.en?.trim() || fallback.en,
     "zh-TW": raw?.zhTW?.trim() || fallback["zh-TW"],
   };
 }
+
+/** Projected `L` (either side may be null) → trimmed `L`. */
+function orL(raw: Partial<Record<keyof L, string | null>> | null | undefined): L {
+  return { en: raw?.en?.trim() || "", "zh-TW": raw?.["zh-TW"]?.trim() || "" };
+}
+
+const hasText = (l: L) => Boolean(l.en || l["zh-TW"]);
 
 // --- site settings -----------------------------------------------------------
 
@@ -82,6 +88,24 @@ const SETTINGS_QUERY = `*[_type=="siteSettings"][0]{
   ui
 }`;
 
+// Interface default for the language toggle (it is visible unless switched off).
+const LANG_TOGGLE_LABEL: L = { en: "中文", "zh-TW": "EN" };
+
+const EMPTY_SETTINGS: SiteSettings = {
+  title: EMPTY,
+  titleTemplate: EMPTY,
+  description: EMPTY,
+  favicon: undefined,
+  wordmark: EMPTY,
+  navItems: [],
+  showLangToggle: true,
+  showThemeToggle: true,
+  langToggleLabel: LANG_TOGGLE_LABEL,
+  copyright: EMPTY,
+  socials: [],
+  ui: {},
+};
+
 const SVG = "image/svg+xml";
 
 function favicon(url: string, mimeType?: string): SiteSettings["favicon"] {
@@ -91,6 +115,11 @@ function favicon(url: string, mimeType?: string): SiteSettings["favicon"] {
     type: "image/png",
     appleUrl: `${url}?w=180&h=180&fit=crop&fm=png`,
   };
+}
+
+/** A bare email address becomes a mailto: link. */
+function normalizeUrl(url: string) {
+  return /^[^\s@/:]+@[^\s@/]+\.[^\s@/]+$/.test(url) ? `mailto:${url}` : url;
 }
 
 /** Fetch a custom icon at build time as a data URI (usable as a CSS mask). */
@@ -108,9 +137,9 @@ async function iconDataUri(url: string, type?: string) {
 
 async function toSocial(raw: RawSocial): Promise<SocialLink> {
   const social: SocialLink = {
-    label: loc(raw.label, EMPTY),
+    label: loc(raw.label),
     icon: raw.icon ?? "link",
-    url: raw.url ?? "#",
+    url: normalizeUrl(raw.url?.trim() ?? ""),
   };
   if (raw.iconUrl) {
     if (raw.keepColor) {
@@ -123,37 +152,35 @@ async function toSocial(raw: RawSocial): Promise<SocialLink> {
   return social;
 }
 
-/** Site settings with every blank field filled from the built-in defaults. */
 export const getSiteSettings = cache(async (): Promise<SiteSettings> => {
-  const d = placeholderSettings;
-  if (!hasSanity) return d;
+  if (!hasSanity) return EMPTY_SETTINGS;
   const raw = await client.fetch<RawSettings | null>(SETTINGS_QUERY);
-  if (!raw) return d;
+  if (!raw) return EMPTY_SETTINGS;
 
   return {
-    title: loc(raw.title, d.title),
-    titleTemplate: loc(raw.titleTemplate, d.titleTemplate),
-    description: loc(raw.description, d.description),
+    title: loc(raw.title),
+    titleTemplate: loc(raw.titleTemplate),
+    description: loc(raw.description),
     favicon: raw.favicon?.url
       ? favicon(raw.favicon.url, raw.favicon.mimeType)
       : undefined,
-    wordmark: loc(raw.wordmark, d.wordmark),
-    navItems: raw.navItems?.length
-      ? raw.navItems.map((item) => ({
-          label: loc(item.label, EMPTY),
-          linkType: item.linkType ?? "home",
-          path: item.path,
-          url: item.url,
-          newTab: item.newTab ?? false,
-        }))
-      : d.navItems,
+    wordmark: loc(raw.wordmark),
+    navItems: (raw.navItems ?? [])
+      .map((item) => ({
+        label: loc(item.label),
+        linkType: item.linkType ?? "home",
+        path: item.path,
+        url: item.url,
+        newTab: item.newTab ?? false,
+      }))
+      .filter((item) => hasText(item.label)),
     showLangToggle: raw.showLangToggle ?? true,
     showThemeToggle: raw.showThemeToggle ?? true,
-    langToggleLabel: loc(raw.langToggleLabel, d.langToggleLabel),
-    copyright: loc(raw.copyright, d.copyright),
-    socials: raw.socials?.length
-      ? await Promise.all(raw.socials.map(toSocial))
-      : d.socials,
+    langToggleLabel: loc(raw.langToggleLabel, LANG_TOGGLE_LABEL),
+    copyright: loc(raw.copyright),
+    socials: (
+      await Promise.all((raw.socials ?? []).filter((s) => s.url?.trim()).map(toSocial))
+    ),
     ui: raw.ui ?? {},
   };
 });
@@ -172,29 +199,36 @@ const PROFILE_QUERY = `*[_type=="profile"][0]{
 
 type RawProfile = { [K in keyof Profile]?: Profile[K] | null };
 
-/** Projected `L` (possibly with null sides) → `L`, per-language fallback. */
-function orL(raw: Partial<Record<keyof L, string | null>> | null | undefined, fallback: L): L {
-  return {
-    en: raw?.en?.trim() || fallback.en,
-    "zh-TW": raw?.["zh-TW"]?.trim() || fallback["zh-TW"],
-  };
-}
+const EMPTY_PROFILE: Profile = {
+  wordmark: EMPTY,
+  tags: [],
+  intro: EMPTY,
+  email: "",
+  bio: [],
+  resumeUrl: undefined,
+  skills: [],
+  experience: [],
+};
 
-/** Profile with every blank field filled from the built-in defaults. */
+const texts = (list: L[] | null | undefined) => (list ?? []).map(orL).filter(hasText);
+
 export const getProfile = cache(async (): Promise<Profile> => {
-  const d = placeholderProfile;
-  if (!hasSanity) return d;
+  if (!hasSanity) return EMPTY_PROFILE;
   const raw = await client.fetch<RawProfile | null>(PROFILE_QUERY);
-  if (!raw) return d;
+  if (!raw) return EMPTY_PROFILE;
   return {
-    wordmark: orL(raw.wordmark, d.wordmark),
-    tags: raw.tags?.length ? raw.tags : d.tags,
-    intro: orL(raw.intro, d.intro),
-    email: raw.email?.trim() || d.email,
-    bio: raw.bio?.length ? raw.bio : d.bio,
-    resumeUrl: raw.resumeUrl ?? d.resumeUrl,
-    skills: raw.skills?.length ? raw.skills : d.skills,
-    experience: raw.experience?.length ? raw.experience : d.experience,
+    wordmark: orL(raw.wordmark),
+    tags: texts(raw.tags),
+    intro: orL(raw.intro),
+    email: raw.email?.trim() || "",
+    bio: texts(raw.bio),
+    resumeUrl: raw.resumeUrl?.trim() || undefined,
+    skills: texts(raw.skills),
+    experience: (raw.experience ?? [])
+      .map(
+        (e): Experience => ({ role: orL(e?.role), org: orL(e?.org), period: orL(e?.period) }),
+      )
+      .filter((e) => hasText(e.role) || hasText(e.org)),
   };
 });
 
@@ -230,15 +264,7 @@ function toMeta(p: RawPostMeta, locale: Locale): PostMeta {
 }
 
 export async function getAllPosts(locale: Locale): Promise<PostMeta[]> {
-  if (!hasSanity) {
-    return placeholderPosts.map((p) => ({
-      slug: p.slug,
-      title: t(p.title, locale),
-      summary: t(p.summary, locale),
-      date: p.date,
-      tags: p.tags.map((tag) => t(tag, locale)),
-    }));
-  }
+  if (!hasSanity) return [];
   const raw = await client.fetch<RawPostMeta[]>(
     `*[_type=="post" && defined(slug.current)]|order(date desc){${POST_FIELDS}}`,
   );
@@ -246,7 +272,7 @@ export async function getAllPosts(locale: Locale): Promise<PostMeta[]> {
 }
 
 export async function getAllSlugs(): Promise<string[]> {
-  if (!hasSanity) return placeholderPosts.map((p) => p.slug);
+  if (!hasSanity) return [];
   return (
     (await client.fetch<string[]>(
       `*[_type=="post" && defined(slug.current)].slug.current`,
@@ -272,18 +298,7 @@ export async function getPost(
   slug: string,
   locale: Locale,
 ): Promise<Post | null> {
-  if (!hasSanity) {
-    const p = placeholderPosts.find((x) => x.slug === slug);
-    if (!p) return null;
-    return {
-      slug: p.slug,
-      title: t(p.title, locale),
-      summary: t(p.summary, locale),
-      date: p.date,
-      tags: p.tags.map((tag) => t(tag, locale)),
-      body: p.body[locale] ?? p.body.en,
-    };
-  }
+  if (!hasSanity) return null;
   const raw = await client.fetch<RawPost | null>(
     `*[_type=="post" && slug.current==$slug][0]{
       ${POST_FIELDS},

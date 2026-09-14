@@ -5,7 +5,6 @@ import { fontVariables, themeScript } from "../shell";
 // Title, description and favicon come from Sanity in [locale]/layout.tsx.
 export const metadata: Metadata = {
   metadataBase: new URL("https://me.shuili.dev"),
-  title: "Shuili",
 };
 
 export default function SiteRootLayout({
