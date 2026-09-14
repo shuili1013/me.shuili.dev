@@ -21,6 +21,7 @@ export default defineConfig({
     structureTool({
       structure: (S) =>
         S.list()
+          .id("content")
           .title("內容")
           .items([
             S.listItem()
@@ -29,6 +30,7 @@ export default defineConfig({
               .icon(CogIcon)
               .child(
                 S.document()
+                  .id("siteSettings")
                   .schemaType("siteSettings")
                   .documentId("siteSettings")
                   .title("網站設定"),
@@ -39,6 +41,7 @@ export default defineConfig({
               .icon(UserIcon)
               .child(
                 S.document()
+                  .id("profile")
                   .schemaType("profile")
                   .documentId("profile")
                   .title("個人資料"),
