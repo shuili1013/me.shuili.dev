@@ -1,0 +1,40 @@
+{
+  "nav": {
+    "home": "Home",
+    "work": "Blogs",
+    "about": "About",
+    "resume": "Resume"
+  },
+  "home": {
+    "email": "Email",
+    "bio": "Bio",
+    "blog": "Blog",
+    "resume": "Resume",
+    "sectionExperience": "Experience",
+    "sectionSkills": "Skills",
+    "sectionFeatured": "Selected Work",
+    "sectionConnect": "Connect",
+    "viewAllWork": "View all →",
+    "present": "Present"
+  },
+  "work": {
+    "title": "Blog",
+    "subtitle": "Things I've built — projects, experiments and writing.",
+    "empty": "No posts yet.",
+    "all": "All",
+    "readMore": "Read more →"
+  },
+  "about": {
+    "title": "About",
+    "resume": "Download résumé"
+  },
+  "post": {
+    "backToWork": "← Back",
+    "backHome": "← Home",
+    "aboutMe": "Read about me →",
+    "tags": "Tags"
+  },
+  "footer": {
+    "rights": "All rights reserved."
+  }
+}

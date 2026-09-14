@@ -1,26 +1,83 @@
 @import "tailwindcss";
 
+/* the `dark` class is toggled on <html> by the theme script / ThemeToggle */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Light (monochrome) */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f6f6f4;
+  --foreground: #1a1a1a;
+  --muted: #6b6b6b;
+  --border: #dcdcd8;
+  --card: #ffffff;
+}
+
+/* Dark is the default look (osga-style) */
+.dark {
+  --background: #0b0b0b;
+  --foreground: #e6e6e6;
+  --muted: #808080;
+  --border: #242424;
+  --card: #121212;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-card: var(--card);
+  --font-mono: var(--font-cubic), var(--font-geist-mono), ui-monospace,
+    "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", monospace;
+  --font-sans: var(--font-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  /* Monospace everywhere — the terminal/code aesthetic */
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Page transition — replayed by [locale]/template.tsx on each navigation */
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-enter {
+  animation: page-enter 0.28s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-enter {
+    animation: none;
+  }
+}
+
+/* Theme toggle: circular reveal spreading from the button (View Transitions).
+   Disable the default cross-fade; the new theme is clipped open by ThemeToggle. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+::view-transition-old(root) {
+  z-index: 0;
+}
+::view-transition-new(root) {
+  z-index: 1;
 }

@@ -1,0 +1,40 @@
+{
+  "nav": {
+    "home": "首頁",
+    "work": "網誌",
+    "about": "關於",
+    "resume": "Resume"
+  },
+  "home": {
+    "email": "Email",
+    "bio": "Bio",
+    "blog": "Blog",
+    "resume": "Resume",
+    "sectionExperience": "經驗",
+    "sectionSkills": "技能",
+    "sectionFeatured": "精選作品",
+    "sectionConnect": "聯絡",
+    "viewAllWork": "查看全部 →",
+    "present": "至今"
+  },
+  "work": {
+    "title": "網誌",
+    "subtitle": "我做過的事 — 專案、實驗與文章。",
+    "empty": "目前還沒有文章。",
+    "all": "全部",
+    "readMore": "閱讀更多 →"
+  },
+  "about": {
+    "title": "關於",
+    "resume": "下載履歷"
+  },
+  "post": {
+    "backToWork": "← 返回",
+    "backHome": "← 回首頁",
+    "aboutMe": "看我的自我介紹 →",
+    "tags": "標籤"
+  },
+  "footer": {
+    "rights": "版權所有。"
+  }
+}
