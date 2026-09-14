@@ -92,6 +92,12 @@ export const profile = defineType({
               validation: (r) => r.required(),
             }),
             defineField({
+              name: "client",
+              title: "案主（選填）",
+              description: "顯示在專案名稱下方，例如：新北市教育局",
+              type: "localeString",
+            }),
+            defineField({
               name: "description",
               title: "簡介（選填）",
               description: "一句話說明你做了什麼。",
@@ -132,12 +138,16 @@ export const profile = defineType({
             select: {
               zh: "title.zhTW",
               en: "title.en",
+              clientZh: "client.zhTW",
+              clientEn: "client.en",
               periodZh: "period.zhTW",
               periodEn: "period.en",
             },
-            prepare: ({ zh, en, periodZh, periodEn }) => ({
+            prepare: ({ zh, en, clientZh, clientEn, periodZh, periodEn }) => ({
               title: bilingual(zh, en) || "（未命名）",
-              subtitle: periodZh || periodEn,
+              subtitle: [clientZh || clientEn, periodZh || periodEn]
+                .filter(Boolean)
+                .join(" · "),
             }),
           },
         }),

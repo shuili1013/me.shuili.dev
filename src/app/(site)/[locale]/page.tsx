@@ -147,6 +147,7 @@ export default async function HomePage({
           <ul className="space-y-6">
             {profile.experience.map((item, i) => {
               const title = t(item.title, locale);
+              const client = t(item.client, locale);
               const description = t(item.description, locale);
               const period = t(item.period, locale);
               const href = item.url ? projectHref(item.url, locale) : undefined;
@@ -169,7 +170,10 @@ export default async function HomePage({
                         title
                       )}
                     </p>
-                    {description && <p className="mt-1 text-muted">{description}</p>}
+                    {client && <p className="text-muted">{client}</p>}
+                    {description && (
+                      <p className="mt-1 text-sm text-foreground/80">{description}</p>
+                    )}
                     {item.postSlug && (
                       <Link
                         href={`/${locale}/blog/${item.postSlug}`}

@@ -80,6 +80,8 @@ export interface BioItem {
 /** A project I've done (the 經歷 section). */
 export interface ProjectItem {
   title: L;
+  /** 案主 — shown as a subtitle. */
+  client: L;
   description: L;
   period: L;
   /** Project page: absolute URL, or a site path like `/blog/haus`. */
@@ -103,6 +105,8 @@ export interface PostMeta {
   slug: string;
   title: string;
   date: string;
+  /** 案主; empty when not set. */
+  client: string;
   summary: string;
   tags: string[];
   cover?: string;

@@ -10,6 +10,7 @@ export function PostCard({ post, locale }: { post: PostMeta; locale: Locale }) {
     >
       <div>
         <p className="font-bold group-hover:underline">{post.title}</p>
+        {post.client && <p className="text-muted">{post.client}</p>}
         {post.summary && <p className="mt-1 text-muted">{post.summary}</p>}
         {post.tags.length > 0 && (
           <div className="mt-2 flex flex-wrap gap-x-3 text-xs text-muted">

@@ -62,6 +62,7 @@ export default async function PostPage({
         />
         <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted">
           {post.date && <time>{post.date}</time>}
+          {post.client && <span>{post.client}</span>}
           {post.tags.map((tag) => (
             <span key={tag}>#{tag}</span>
           ))}

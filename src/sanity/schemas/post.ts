@@ -25,6 +25,12 @@ export const post = defineType({
       validation: (r) => r.required(),
     }),
     defineField({ name: "date", title: "日期", type: "date" }),
+    defineField({
+      name: "client",
+      title: "案主（選填）",
+      description: "有填才會顯示在日期旁邊。",
+      type: "localeString",
+    }),
     defineField({ name: "summary", title: "摘要", type: "localeText" }),
     defineField({
       name: "tags",

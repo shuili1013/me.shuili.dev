@@ -202,9 +202,10 @@ const PROFILE_QUERY = `*[_type=="profile"][0]{
   },
   skills[]${LOC},
   experience[]{
-    // Items saved before 經歷 became projects used role/org.
+    // Items saved before 經歷 became projects used role (→ title) / org (→ client).
     "title": coalesce(title, role)${LOC},
-    "description": coalesce(description, org)${LOC},
+    "client": coalesce(client, org)${LOC},
+    description${LOC},
     period${LOC}, url,
     "postSlug": post->slug.current
   }
@@ -255,6 +256,7 @@ export const getProfile = cache(async (): Promise<Profile> => {
       .map(
         (e): ProjectItem => ({
           title: orL(e?.title),
+          client: orL(e?.client),
           description: orL(e?.description),
           period: orL(e?.period),
           url: e?.url?.trim() || undefined,
@@ -270,6 +272,7 @@ export const getProfile = cache(async (): Promise<Profile> => {
 interface RawPostMeta {
   slug: string;
   title: L;
+  client?: L | null;
   summary?: L;
   date?: string;
   tags?: L[] | null;
@@ -279,6 +282,7 @@ interface RawPostMeta {
 const POST_FIELDS = `
   "slug": slug.current,
   title${LOC},
+  client${LOC},
   summary${LOC},
   "date": date,
   tags[]${LOC},
@@ -289,6 +293,7 @@ function toMeta(p: RawPostMeta, locale: Locale): PostMeta {
   return {
     slug: p.slug,
     title: t(p.title, locale),
+    client: t(p.client, locale).trim(),
     summary: p.summary ? t(p.summary, locale) : "",
     date: p.date ? p.date.slice(0, 10) : "",
     tags: (p.tags ?? []).map((tag) => t(tag, locale)).filter(Boolean),
